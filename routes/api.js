@@ -34,6 +34,15 @@ router.post('/save', (req, res) => {
     });
 });
 
+// Go to login page
+router.get('/login', (req,res) => {
+    res.json({msg: 'This is a login page'})
+})
+
+// Go to register page
+router.get('/reg', (req,res) => {
+    res.json({msg: 'This is a register page'})
+})
 
 
 // Verify the post
