@@ -1,80 +1,117 @@
 const express = require('express')
 const router = express.Router()
+const jwt = require('jsonwebtoken')
 
 const BlogPost = require('../models/BlogPost')
+const User = require('../models/user')
 
 // An api endpoint that returns a msg
 router.get('/', (req, res) => {
-
+    
     BlogPost.find({})
         .then((data) => {
             res.json(data)
         })
         .catch((error) => {
-            console.log('error: ', error)
+            console.log('server error: ', error)
         })
-
 });
 
-router.post('/save', (req, res) => {
+router.post('/save', verify, (req, res) => {
     console.log("Body: ", req.body)
-    const data = req.body
 
-    const newBlogPost = new BlogPost(data)
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if (err) { res.sendStatus(403)  } 
+        else {
 
-    newBlogPost.save((error) => {
-        if (error) {
-            res.status(500).json({ msg: "Internal server error" })
-            return;
-        }
-        // BlogPost
-        return res.json({
-            msg: "We received the data"
-        });
-    });
-});
+            const data = req.body
+
+            const newBlogPost = new BlogPost(data)
+        
+            newBlogPost.save((error) => {
+                if (error) {
+                    res.status(500).json({ msg: "Internal server error" })
+                    return;
+                }
+                // BlogPost
+                return res.json({
+                    msg: "We received the data"
+                });
+            });
+        }}
+    )
+})
+
+// USER PAGEs
 
 // Go to login page
+// localhost:8080/api/login
 router.get('/login', (req,res) => {
-    res.json({msg: 'This is a login page'})
+    let arrUser;
+    showUsers().then(() => res.json(data))
 })
 
 // Go to register page
 router.get('/reg', (req,res) => {
-    res.json({msg: 'This is a register page'})
+    User.find({})
+    .then((data) => {
+        res.json(data)
+    })
+    .catch((error) => {
+        console.log('server error: ', error)
+    })
 })
 
 
-// Verify the post
-router.post('/post', verify, (req, res) => {
-
-    jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) {
-            res.sendStatus(403)
-        } else {
-            res.json({
-                message: 'Post created...',
-                authData
-            })
-        }
-    })
-}
-);
-
-router.post('/login', (req, res) => {
+router.post('/reg', (req, res) => {
+    console.log(req.body)
     const user = {
-        id: 1,
-        username: 'Minh',
-        email: 'minh@gmail.com'
+        username: req.body.username,
+        password: req.body.password
     }
 
-    jwt.sign({ user: user }, 'secretkey', { expiresIn: '1d' }, (err, token) => {
-        res.json({
-            token: token
-        })
-    })
-}
-)
+    // jwt.sign({ user }, 'secretkey', { expiresIn: '1d' }, (err, token) => {
+    //     res.json({
+    //         token: token
+    //     })
+    // })
+
+    const data = req.body
+
+    const newUser = new User(data)
+
+    newUser.save((error) => {
+        if (error) {
+            res.status(500).json({ msg: "Internal server error" })
+            return;
+        }
+        // User
+        return res.json({
+            msg: "We received the data"
+        });
+    });
+
+
+    
+})
+
+// Verify the post
+// router.post('/post', verify, (req, res) => {
+
+//     jwt.verify(req.token, 'secretkey', (err, authData) => {
+//         if (err) {
+//             res.sendStatus(403)
+//         } else {
+//             res.json({
+//                 message: 'Post created...',
+//                 authData
+//             })
+//         }
+//     })
+// }
+// );
+
+
 
 
 function verify(req, res, next) {
