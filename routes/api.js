@@ -7,7 +7,7 @@ const User = require('../models/user')
 
 // An api endpoint that returns a msg
 router.get('/', (req, res) => {
-    
+
     BlogPost.find({})
         .then((data) => {
             res.json(data)
@@ -21,13 +21,13 @@ router.post('/save', verify, (req, res) => {
     console.log("Body: ", req.body)
 
     jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) { res.sendStatus(403)  } 
+        if (err) { res.sendStatus(403) }
         else {
 
             const data = req.body
 
             const newBlogPost = new BlogPost(data)
-        
+
             newBlogPost.save((error) => {
                 if (error) {
                     res.status(500).json({ msg: "Internal server error" })
@@ -35,10 +35,11 @@ router.post('/save', verify, (req, res) => {
                 }
                 // BlogPost
                 return res.json({
-                    msg: "We received the data"
+                    msg: "We received the post"
                 });
             });
-        }}
+        }
+    }
     )
 })
 
@@ -46,29 +47,75 @@ router.post('/save', verify, (req, res) => {
 
 // Go to login page
 // localhost:8080/api/login
-router.get('/login', (req,res) => {
+router.get('/login', (req, res) => {
     let arrUser;
     showUsers().then(() => res.json(data))
 })
 
 // Go to register page
-router.get('/reg', (req,res) => {
+router.get('/reg', (req, res) => {
     User.find({})
-    .then((data) => {
-        res.json(data)
-    })
-    .catch((error) => {
-        console.log('server error: ', error)
-    })
+        .then((data) => {
+            res.json(data)
+        })
+        .catch((error) => {
+            console.log('server error: ', error)
+        })
 })
 
 
-router.post('/reg', (req, res) => {
-    console.log(req.body)
-    const user = {
-        username: req.body.username,
-        password: req.body.password
+router.post('/reg', async (req, res) => {
+    // Initial
+    const user = req.body
+    console.log("user from client: ", user)
+    let allUsers = []
+    let isUserInDatabase;
+
+    fetchUsersData()
+
+    function fetchUsersData() {
+        User.find({})
+            .then((data) => {
+                allUsers = [...data]
+                isUserInDatabase = allUsers.filter(checkUser)
+
+                saveUser()
+            })
+            .catch((error) => {
+                console.log('server error: ', error)
+            })
     }
+    
+    function checkUser(element) {
+        return (element.username === user.username)
+    }
+    function saveUser() {
+        console.log("isUserInDB: ", isUserInDatabase)
+        if (isUserInDatabase.length > 0) {
+            return res.send({ isUserExist: true })
+        } else {
+            // Save item to database
+            const data = req.body
+
+            const newUser = new User(data)
+
+            newUser.save((error) => {
+                if (error) {
+                    res.status(500).send({ msg: "500 Internal server error" })
+                    return;
+                }
+                // User
+                return res.send({
+                    isUserExist: false
+                });
+            });
+
+        }
+    }
+
+
+
+
 
     // jwt.sign({ user }, 'secretkey', { expiresIn: '1d' }, (err, token) => {
     //     res.json({
@@ -76,23 +123,10 @@ router.post('/reg', (req, res) => {
     //     })
     // })
 
-    const data = req.body
-
-    const newUser = new User(data)
-
-    newUser.save((error) => {
-        if (error) {
-            res.status(500).json({ msg: "Internal server error" })
-            return;
-        }
-        // User
-        return res.json({
-            msg: "We received the data"
-        });
-    });
 
 
-    
+
+
 })
 
 // Verify the post
