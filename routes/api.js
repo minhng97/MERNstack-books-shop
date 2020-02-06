@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
+const md5 = require("md5")
 
 const BlogPost = require('../models/BlogPost')
 const User = require('../models/user')
@@ -8,7 +9,7 @@ const User = require('../models/user')
 // An api endpoint that returns a msg
 router.get('/', (req, res) => {
 
-    BlogPost.find({})
+    fetchBlogPosts()
         .then((data) => {
             res.json(data)
         })
@@ -46,20 +47,37 @@ router.post('/save', verify, (req, res) => {
 // USER PAGEs
 
 // Go to login page
-// localhost:8080/api/login
-router.get('/login', (req, res) => {
-    let arrUser;
-    showUsers().then(() => res.json(data))
+router.post('/log', async (req, res) => {
+    var data;
+    var arrUser;
+
+    data = req.body
+    arrUser = await fetchUsersData()
+
+    validate()
+
+    function validate() {
+        arrUser = arrUser.filter(user => {
+            return user.username === data.username && user.password === data.password
+        })
+
+        if (arrUser.length > 0) {
+            res.send({ msg: true })
+        } else {
+            res.send({ msg: false })
+        }
+    }
 })
 
 // Go to register page
 router.get('/reg', (req, res) => {
-    User.find({})
+    fetchUsersData()
         .then((data) => {
             res.json(data)
         })
         .catch((error) => {
             console.log('server error: ', error)
+            res.json({ msg: "server error" })
         })
 })
 
@@ -72,33 +90,39 @@ router.post('/reg', async (req, res) => {
     var isUserInDatabase;
 
     // Functions start here
-    fetchUsersData()
 
-    allUsers = await fetchUsersData()
- 
-    isUserInDatabase = allUsers.filter(checkUser)
+    var userIsExist = await checkUserData()
 
     saveUser()
 
+    async function checkUserData() {
+        allUsers = await fetchUsersData()
 
+        isUserInDatabase = allUsers.filter(checkUser)
 
-    function fetchUsersData() {
-        return Promise
-            .resolve(User.find({}))
+        if (isUserInDatabase.length > 0) { return true }
+        else {
+            return false
+        }
     }
+
 
     function checkUser(element) {
         return (element.username === data.username)
     }
 
     function saveUser() {
-        
-        if (isUserInDatabase.length > 0) {
+
+        if (userIsExist) {
             return res.send({ isUserExist: true })
         } else {
             // Save item to database
-           
-            const newUser = new User(data)
+            const { username, password } = data
+
+            const newUser = new User({
+                username,
+                password: md5(password)
+            })
 
             newUser.save((error) => {
                 if (error) {
@@ -118,11 +142,7 @@ router.post('/reg', async (req, res) => {
 
 
 
-    // jwt.sign({ user }, 'secretkey', { expiresIn: '1d' }, (err, token) => {
-    //     res.json({
-    //         token: token
-    //     })
-    // })
+
 
 
 
@@ -146,7 +166,15 @@ router.post('/reg', async (req, res) => {
 // }
 // );
 
+function fetchBlogPosts() {
+    return Promise
+        .resolve(BlogPost.find({}))
+}
 
+function fetchUsersData() {
+    return Promise
+        .resolve(User.find({}))
+}
 
 
 function verify(req, res, next) {
