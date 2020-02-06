@@ -73,45 +73,47 @@ router.post('/reg', async (req, res) => {
 
     fetchUsersData()
 
-    function fetchUsersData() {
-        User.find({})
-            .then((data) => {
-                allUsers = [...data]
-                isUserInDatabase = allUsers.filter(checkUser)
+    async function fetchUsersData() {
+        try {
+            let data = await User.find({})
+            allUsers = [...data]
+            isUserInDatabase = allUsers.filter(checkUser)
 
-                saveUser()
-            })
-            .catch((error) => {
-                console.log('server error: ', error)
-            })
-    }
-    
-    function checkUser(element) {
-        return (element.username === user.username)
-    }
-    function saveUser() {
-        console.log("isUserInDB: ", isUserInDatabase)
-        if (isUserInDatabase.length > 0) {
-            return res.send({ isUserExist: true })
-        } else {
-            // Save item to database
-            const data = req.body
-
-            const newUser = new User(data)
-
-            newUser.save((error) => {
-                if (error) {
-                    res.status(500).send({ msg: "500 Internal server error" })
-                    return;
-                }
-                // User
-                return res.send({
-                    isUserExist: false
-                });
-            });
-
+            saveUser()
+        }
+        catch (error) {
+            console.log('server error: ', error)
         }
     }
+    
+    
+
+function checkUser(element) {
+    return (element.username === user.username)
+}
+function saveUser() {
+    
+    if (isUserInDatabase.length > 0) {
+        return res.send({ isUserExist: true })
+    } else {
+        // Save item to database
+        const data = req.body
+
+        const newUser = new User(data)
+
+        newUser.save((error) => {
+            if (error) {
+                res.status(500).send({ msg: "500 Internal server error" })
+                return;
+            }
+            // User
+            return res.send({
+                isUserExist: false
+            });
+        });
+
+    }
+}
 
 
 
