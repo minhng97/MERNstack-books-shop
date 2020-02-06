@@ -47,38 +47,26 @@ class Register extends Component {
 
 
         // Get users from database
-        axios.get('/api/reg')
-            .then(({ data }) => {
-
+        axios({
+            url: '/api/reg',
+            method: 'POST',
+            data: payload,
+            timeout: 70000
+        })
+            .then((response) => {
+    
                 // Check if the username is already existed
-                const isUserInDatabase = data.some(checkUser)
-
-
-                if (isUserInDatabase === true) {
+                const isUserExist = response.data.isUserExist
+                
+                if (isUserExist === true) {
                     this.setState({ info: "The username is already exist" })
                 } else {
-                    // Save item to database
-                    axios({
-                        url: '/api/reg',
-                        method: 'POST',
-                        data: payload
-                    })
-                        .then(() => {
-                            console.log('data has been sent to server');
-                            this.setState({ info: "You have succesfully registered!" })
+                    this.setState({ info: "You have succesfully registered!" })
 
-                            setInterval(() => {
-                                window.location.href = '/';
-                            }, 1000);
-
-                        })
-                        .catch(() => {
-                            this.setState({ info: "500 server error when send the data" })
-                        })
-                }
-
-                function checkUser(element) {
-                    return (element.username === payload.username)
+                    setInterval(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                    
                 }
 
                 console.log(this.state)
@@ -86,9 +74,6 @@ class Register extends Component {
             .catch((error) => {
                 alert('Error getting users: ', error)
             })
-
-
-
 
     }
 
