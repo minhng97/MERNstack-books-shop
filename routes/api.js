@@ -21,27 +21,22 @@ router.get('/', (req, res) => {
 router.post('/save', verify, (req, res) => {
     console.log("Body: ", req.body)
 
-    jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) { res.sendStatus(403) }
-        else {
 
-            const data = req.body
+    const data = req.body
 
-            const newBlogPost = new BlogPost(data)
+    const newBlogPost = new BlogPost(data)
 
-            newBlogPost.save((error) => {
-                if (error) {
-                    res.status(500).json({ msg: "Internal server error" })
-                    return;
-                }
-                // BlogPost
-                return res.json({
-                    msg: "We received the post"
-                });
-            });
+    newBlogPost.save((error) => {
+        if (error) {
+            res.status(500).json({ msg: "Internal server error" })
+            return;
         }
-    }
-    )
+        // BlogPost
+        return res.json({
+            msg: "We received the post"
+        });
+    });
+
 })
 
 // USER PAGEs
@@ -62,7 +57,19 @@ router.post('/log', async (req, res) => {
         })
 
         if (arrUser.length > 0) {
-            res.send({ msg: true })
+            // Verify the data
+            jwt.sign(data.username, 'secretkey', (err, token) => {
+                if (err) {
+                    res.sendStatus(403)
+                } else {
+                    res.send({
+                        msg: true,
+                        token
+                    })
+                }
+            })
+
+
         } else {
             res.send({ msg: false })
         }
@@ -179,14 +186,26 @@ function fetchUsersData() {
 
 function verify(req, res, next) {
     const bearerHeader = req.headers['authorization'];
-
+console.log("req: ", req.headers)
     if (typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
 
-        req.token = bearerToken;
+        // Verify the post
 
-        next()
+
+        jwt.verify(bearerToken, 'secretkey', (err, authData) => {
+            if (err) {
+                res.sendStatus(403)
+            } else {
+
+                req.token = bearerToken;
+
+                next()
+            }
+        })
+
+
     } else {
         res.json({
             msg: 'You must login first'
