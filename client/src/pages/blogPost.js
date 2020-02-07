@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-
+import {
+    ListGroup, ListGroupItem,
+    Button, Form, FormGroup, Label, Input, FormText
+} from 'reactstrap';
 
 class BlogPost extends Component {
     state = {
         title: '',
         body: '',
-        posts: []
+        posts: [],
+        info: null
     }
 
     componentDidMount() {
@@ -26,10 +30,10 @@ class BlogPost extends Component {
                 this.setState({
                     posts: reverseData
                 })
-
+                console.log("The posts have been loaded")
             })
             .catch((error) => {
-                alert('Error: ', error)
+                alert('Error getting posts: ', error)
             })
     }
 
@@ -46,20 +50,28 @@ class BlogPost extends Component {
 
         const payload = {
             title: this.state.title,
-            body: this.state.body
+            body: this.state.body,
+            token: localStorage.getItem("token")
         }
         // Save item to database
         axios({
             url: '/api/save',
             method: 'POST',
-            data: payload
+            data: payload,
+            headers: { "authorization": `Bearer ${localStorage.getItem("token")}` }
         })
             .then(() => {
-                console.log('data has been sent to server');
+
+                this.setState({ info: "Posted successful!" })
+                setInterval(() => {
+                    this.setState(() => ({ info: null }))
+                }, 1200);
                 this.resetUserInput();
-                this.getBlogPost(); // set state
+                this.getBlogPost();
             })
-            .catch(() => console.log('500 internal error'))
+            .catch(() => {
+                this.setState({ info: "500 internal error" })
+            })
     }
 
     resetUserInput = () => {
@@ -73,11 +85,11 @@ class BlogPost extends Component {
 
         if (!posts.length) return null;
 
-        return posts.map(post => <li
+        return posts.map(post => <ListGroupItem
             className="blog-post__display">
             <h6>{post.title}</h6>
             <p>{post.body}</p>
-        </li>
+        </ListGroupItem>
         )
     }
 
@@ -86,9 +98,10 @@ class BlogPost extends Component {
         return (
             <div className="app">
 
-                <form onSubmit={this.submit}>
+                {this.state.info}
+                <Form onSubmit={this.submit}>
                     <div className="form-input">
-                        <input
+                        <Input
                             type="text"
                             name="title"
                             placeholder="Title"
@@ -107,12 +120,12 @@ class BlogPost extends Component {
                     </div>
 
                     <button>Submit</button>
-                </form>
+                </Form>
 
                 <div className="posts">
-                    <ul>
+                    <ListGroup>
                         {this.displayBlogPost(this.state.posts)}
-                    </ul>
+                    </ListGroup>
                 </div>
 
 
