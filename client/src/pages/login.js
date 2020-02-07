@@ -32,24 +32,25 @@ class Login extends Component {
             password: md5(this.state.password)
         }
 
-console.log(md5(payload.password))
+
         // Get users from database
         axios({
             url: '/api/log',
             method: 'POST',
             data: payload,
-            timeout: 70000
+            timeout: 70000,
+            headers: {'Authorization': `Bearer ${this.state.token}`},
         })
             .then((response) => {
     
                 // Check if the username is already existed
                 const isValid = response.data.msg
-                console.log(isValid)
+                console.log("res data: ", response.data)
                 if (isValid === false) {
                     this.setState({ info: "Wrong username or password" })
                 } else {
-                    this.setState({ info: "You have succesfully login!" })
-
+                    this.setState({ info: "You have succesfully login!"})
+                    localStorage.setItem('token', response.data.token)
                     setInterval(() => {
                         window.location.href = '/';
                     }, 1000);
