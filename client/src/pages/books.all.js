@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import {
-    ListGroup, ListGroupItem
-    , Form, Input, FormGroup, Label
-} from 'reactstrap';
+
+import { Container, Row } from 'reactstrap';
 import Button from 'antd/es/button';
 import 'antd/dist/antd.css';
 
@@ -39,9 +37,11 @@ const AllBooks = props => {
         <div>
             Book page
             <div className="posts">
-                <ListGroup>
+                <Container>
+                <Row>
                     {displayBooks(books)}
-                </ListGroup>
+                </Row>
+                </Container>
             </div>
         </div>
     )
