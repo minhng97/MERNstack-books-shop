@@ -19,8 +19,10 @@ const TopMenu = props => {
   const [isOpen, setIsOpen] = useState(false);
 
   const context = useContext(UserContext)
-console.log(context)
+  console.log("context from user.context: ", context)
+  
   const toggle = () => setIsOpen(!isOpen);
+  const logout = () => localStorage.removeItem("token")
 
   return (
     <div>
@@ -49,11 +51,11 @@ console.log(context)
           </Nav>
         </Collapse>
       </Navbar>
-      <p>{context.login}</p>
-      <Button type="button" color="warning" onClick={context.logout}>Logout</Button>
+
+      <Button type="button" color="warning" onClick={logout}>Logout</Button>
     </div>
 
   );
 };
-console.log(typeof TopMenu)
+
 export default TopMenu;
