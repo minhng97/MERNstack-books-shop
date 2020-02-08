@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import {
-    ListGroup, ListGroupItem,
-    Button, Form, FormGroup, Label, Input, FormText
+    ListGroup, ListGroupItem
+    , Form, Input, FormGroup, Label
 } from 'reactstrap';
+import Button from 'antd/es/button';
+import 'antd/dist/antd.css';
+
+import displayBlogPost from './displayContent/display.blog'
 
 class BlogPost extends Component {
     state = {
         title: '',
         body: '',
         posts: [],
-        info: null
+        info: null,
+        loading: false,
+        iconLoading: false,
     }
 
     componentDidMount() {
@@ -44,10 +50,17 @@ class BlogPost extends Component {
             [name]: value
         })
     }
+    enterLoading = () => {
+        this.setState({ loading: !this.state.loading });
+    };
 
+    enterIconLoading = () => {
+        this.setState({ iconLoading: !this.state.iconLoading });
+    };
     submit = (event) => {
         event.preventDefault()
-
+        this.enterIconLoading()
+        this.enterLoading()
         const payload = {
             title: this.state.title,
             body: this.state.body,
@@ -62,15 +75,18 @@ class BlogPost extends Component {
         })
             .then(() => {
 
-                this.setState({ info: "Posted successful!" })
                 setInterval(() => {
                     this.setState(() => ({ info: null }))
                 }, 1200);
                 this.resetUserInput();
                 this.getBlogPost();
+                this.enterIconLoading()
+                this.enterLoading()
             })
             .catch(() => {
                 this.setState({ info: "500 internal error" })
+                this.enterIconLoading()
+                this.enterLoading()
             })
     }
 
@@ -81,25 +97,22 @@ class BlogPost extends Component {
         });
     }
 
-    displayBlogPost = (posts) => {
-
-        if (!posts.length) return null;
-
-        return posts.map(post => <ListGroupItem
-            className="blog-post__display">
-            <h6>{post.title}</h6>
-            <p>{post.body}</p>
-        </ListGroupItem>
-        )
-    }
+   
 
     render() {
         //JSX
         return (
             <div className="app">
-
+                {/* // Warning */}
                 {this.state.info}
-                <Form onSubmit={this.submit}>
+
+                <Form onSubmit={this.submit} style={{
+                    border: "1px solid lightgray",
+                    width: "auto",
+                    padding: "10px",
+                    borderRadius: "4px",
+                    backgroundColor: "#d3d3d32e"}}>
+                    <div style={{padding: "10px", width: "50%"}}>
                     <div className="form-input">
                         <Input
                             type="text"
@@ -118,18 +131,21 @@ class BlogPost extends Component {
                             onChange={this.handleChange}>
                         </textarea>
                     </div>
-
-                    <button>Submit</button>
+                        <Button type="primary" loading={this.state.loading} onClick={this.submit}>
+                    Submit
+                        </Button>
+                </div>
+                
                 </Form>
 
-                <div className="posts">
-                    <ListGroup>
-                        {this.displayBlogPost(this.state.posts)}
-                    </ListGroup>
-                </div>
-
-
+            <div className="posts">
+                <ListGroup>
+                    {displayBlogPost(this.state.posts)}
+                </ListGroup>
             </div>
+
+
+            </div >
         )
     }
 
