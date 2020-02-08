@@ -5,8 +5,8 @@ const md5 = require("md5")
 
 const BlogPost = require('../models/BlogPost')
 const User = require('../models/user')
+const Books = require('../models/books')
 
-// An api endpoint that returns a msg
 router.get('/', (req, res) => {
 
     fetchBlogPosts()
@@ -43,8 +43,8 @@ router.post('/save', verify, (req, res) => {
 
 // Go to login page
 router.post('/log', async (req, res) => {
-    var data;
-    var arrUser;
+    let data;
+    let arrUser;
 
     data = req.body
     arrUser = await fetchUsersData()
@@ -157,21 +157,18 @@ router.post('/reg', async (req, res) => {
 
 })
 
-// Verify the post
-// router.post('/post', verify, (req, res) => {
+// Books page
 
-//     jwt.verify(req.token, 'secretkey', (err, authData) => {
-//         if (err) {
-//             res.sendStatus(403)
-//         } else {
-//             res.json({
-//                 message: 'Post created...',
-//                 authData
-//             })
-//         }
-//     })
-// }
-// );
+router.get('/allbooks', (req, res) => {
+    fetchBooks()
+    .then((data) => {
+        res.json(data)
+    })
+    .catch((error) => {
+        console.log('server error: ', error)
+    })
+})
+
 
 function fetchBlogPosts() {
     return Promise
@@ -183,6 +180,10 @@ function fetchUsersData() {
         .resolve(User.find({}))
 }
 
+function fetchBooks() {
+    return Promise
+        .resolve(Books.find({}))
+}
 
 function verify(req, res, next) {
     const bearerHeader = req.headers['authorization'];
@@ -214,3 +215,20 @@ console.log("req: ", req.headers)
 }
 
 module.exports = router
+
+
+// Verify the post
+// router.post('/post', verify, (req, res) => {
+
+//     jwt.verify(req.token, 'secretkey', (err, authData) => {
+//         if (err) {
+//             res.sendStatus(403)
+//         } else {
+//             res.json({
+//                 message: 'Post created...',
+//                 authData
+//             })
+//         }
+//     })
+// }
+// );
