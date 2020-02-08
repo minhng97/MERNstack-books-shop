@@ -20,7 +20,7 @@ const TopMenu = props => {
 
   const context = useContext(UserContext)
   console.log("context from user.context: ", context)
-  
+
   const toggle = () => setIsOpen(!isOpen);
   const logout = () => localStorage.removeItem("token")
 
@@ -38,6 +38,14 @@ const TopMenu = props => {
                 <Link to="/">Home</Link>
               </NavLink>
             </NavItem>
+
+            <NavItem>
+              <NavLink>
+                <Link to="/books">Books</Link>
+              </NavLink>
+            </NavItem>
+          </Nav>
+          <Nav navbar>
             <NavItem>
               <NavLink>
                 <Link to="/reg">Register</Link>
