@@ -91,16 +91,20 @@ router.get('/reg', (req, res) => {
 
 router.post('/reg', async (req, res) => {
     // Initial
-    var data = req.body
+    const data = req.body
     console.log("user from client: ", data)
-    var allUsers = []
-    var isUserInDatabase;
+    let allUsers = []
+    let isUserInDatabase;
 
     // Functions start here
 
-    var userIsExist = await checkUserData()
+    let userIsExist = await checkUserData()
 
-    saveUser()
+    if (userIsExist) {
+        return res.send({ isUserExist: true })
+    } else {
+        saveUser()
+    }
 
     async function checkUserData() {
         allUsers = await fetchUsersData()
@@ -120,9 +124,6 @@ router.post('/reg', async (req, res) => {
 
     function saveUser() {
 
-        if (userIsExist) {
-            return res.send({ isUserExist: true })
-        } else {
             // Save item to database
             const { username, password } = data
 
@@ -142,18 +143,8 @@ router.post('/reg', async (req, res) => {
                 });
             });
 
-        }
+        
     }
-
-
-
-
-
-
-
-
-
-
 
 })
 
@@ -161,12 +152,12 @@ router.post('/reg', async (req, res) => {
 
 router.get('/allbooks', (req, res) => {
     fetchBooks()
-    .then((data) => {
-        res.json(data)
-    })
-    .catch((error) => {
-        console.log('server error: ', error)
-    })
+        .then((data) => {
+            res.json(data)
+        })
+        .catch((error) => {
+            console.log('server error: ', error)
+        })
 })
 
 
@@ -187,7 +178,7 @@ function fetchBooks() {
 
 function verify(req, res, next) {
     const bearerHeader = req.headers['authorization'];
-console.log("req: ", req.headers)
+    console.log("req: ", req.headers)
     if (typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
