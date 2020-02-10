@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import {
-    ListGroup, ListGroupItem
-    , Form, Input, FormGroup, Label
-} from 'reactstrap';
+import { Form, Input } from 'reactstrap';
 import Button from 'antd/es/button';
 import 'antd/dist/antd.css';
 
@@ -22,7 +19,7 @@ class BlogPost extends Component {
     async componentDidMount() {
         try {
             let { data } = await this.getBlogPost()
-            
+
             this.setState({ posts: data.reverse() })
         }
         catch (error) {
@@ -58,33 +55,43 @@ class BlogPost extends Component {
             body: this.state.body,
             token: localStorage.getItem("token")
         }
-        // Save item to database
-        axios({
-            url: '/api/save',
-            method: 'POST',
-            data: payload,
-            headers: { "authorization": `Bearer ${localStorage.getItem("token")}` }
-        })
-            .then(async () => {
-
-                setInterval(() => {
-                    this.setState(() => ({ info: null }))
-                }, 1200);
-
-                this.resetUserInput();
-                
-                let { data } = await this.getBlogPost();
-                this.setState(state => ({posts: data.reverse()}))
-
-                this.enterIconLoading()
-                this.enterLoading()
+        if (this.state.title.trim() === '' || this.state.body.trim() === '') {
+            this.setState({
+                info: "Please input title and body"
             })
-            .catch(() => {
-                this.setState(state => ({ info: "500 internal error" }))
+            this.setState(() => ({ loading: false }))
+            this.setState(() => ({ iconLoading: false }))
 
-                this.enterIconLoading()
-                this.enterLoading()
+        }
+        else {
+            // Save item to database
+            axios({
+                url: '/api/save',
+                method: 'POST',
+                data: payload,
+                headers: { "authorization": `Bearer ${localStorage.getItem("token")}` }
             })
+                .then(async () => {
+
+                    setInterval(() => {
+                        this.setState(() => ({ info: null }))
+                    }, 1200);
+
+                    this.resetUserInput();
+
+                    let { data } = await this.getBlogPost();
+                    this.setState(state => ({ posts: data.reverse() }))
+
+                    this.enterIconLoading()
+                    this.enterLoading()
+                })
+                .catch(() => {
+                    this.setState(state => ({ info: "500 internal error" }))
+
+                    this.enterIconLoading()
+                    this.enterLoading()
+                })
+        }
     }
 
     resetUserInput = () => {
@@ -100,17 +107,11 @@ class BlogPost extends Component {
         //JSX
         return (
             <div className="app">
-                {/* // Warning */}
+
                 {this.state.info}
 
-                <Form onSubmit={this.submit} style={{
-                    border: "1px solid lightgray",
-                    width: "auto",
-                    padding: "10px",
-                    borderRadius: "4px",
-                    backgroundColor: "#d3d3d32e"
-                }}>
-                    <div style={{ padding: "10px", width: "50%" }}>
+                <Form onSubmit={this.submit} style={formStyle}>
+                    <div style={divFormStyle}>
                         <div className="form-input">
                             <Input
                                 type="text"
@@ -136,11 +137,9 @@ class BlogPost extends Component {
 
                 </Form>
 
-                <div className="posts">
-                    <ListGroup>
-                        {displayBlogPost(this.state.posts)}
-                    </ListGroup>
-                </div>
+                {displayBlogPost(this.state.posts)}
+
+
 
 
             </div >
@@ -149,4 +148,12 @@ class BlogPost extends Component {
 
 }
 
+const formStyle = {
+    border: "1px solid lightgray",
+    width: "auto",
+    padding: "10px",
+    borderRadius: "4px",
+    backgroundColor: "#d3d3d32e"
+}
+const divFormStyle = { padding: "10px", width: "50%" }
 export default BlogPost;
