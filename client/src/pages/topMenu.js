@@ -23,10 +23,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const TopMenu = props => {
   const [isOpen, setIsOpen] = useState(false);
-  const context = useContext(CartContext)
-
-  // const context = useContext(UserContext)
-  // console.log("context from user.context: ", context)
+  const { cartItems } = useContext(CartContext)
 
   const toggle = () => setIsOpen(!isOpen);
   const logout = () => localStorage.removeItem("token")
@@ -68,7 +65,7 @@ const TopMenu = props => {
             </NavItem>
 
             <NavItem>
-              <Button type="primary"><Icon type="shopping-cart" />{context.cartItems.length}</Button>
+              <Button type="primary"><Icon type="shopping-cart" />{cartItems.length}</Button>
             </NavItem>
 
           </Nav>
