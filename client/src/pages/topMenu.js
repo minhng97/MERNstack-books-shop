@@ -29,10 +29,10 @@ const TopMenu = props => {
   const logout = () => localStorage.removeItem("token")
 
   return (
-    <div>
+    <>
       <Navbar color="light" light expand="md">
-        <NavbarBrand>
-          <NavLink to="/">React App</NavLink>
+        <NavbarBrand href="/" style={{color: "#007bff"}}>
+          <NavItem>React App</NavItem>
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar>
@@ -65,7 +65,9 @@ const TopMenu = props => {
             </NavItem>
 
             <NavItem>
-              <Button type="primary"><Icon type="shopping-cart" />{cartItems.length}</Button>
+              <NavLink to="/bookcart">
+                <Button type="primary"><Icon type="shopping-cart" />{cartItems.length}</Button>
+              </NavLink>
             </NavItem>
 
           </Nav>
@@ -73,7 +75,7 @@ const TopMenu = props => {
       </Navbar>
 
       <Button type="danger" color="warning" onClick={logout}>Logout</Button>
-    </div>
+    </>
 
   );
 };
