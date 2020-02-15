@@ -25,13 +25,16 @@ const TopMenu = props => {
   const [isOpen, setIsOpen] = useState(false);
   const { cartItems } = useContext(CartContext)
 
+  let counting = cartItems.reduce((acc, curr, ind) => {
+    return acc + curr.quantity
+  }, 0)
   const toggle = () => setIsOpen(!isOpen);
   const logout = () => localStorage.removeItem("token")
 
   return (
     <>
       <Navbar color="light" light expand="md">
-        <NavbarBrand href="/" style={{color: "#007bff"}}>
+        <NavbarBrand href="/" style={{ color: "#007bff" }}>
           <NavItem>React App</NavItem>
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
@@ -66,7 +69,7 @@ const TopMenu = props => {
 
             <NavItem>
               <NavLink to="/bookcart">
-                <Button type="primary"><Icon type="shopping-cart" />{cartItems.length}</Button>
+                <Button type="primary"><Icon type="shopping-cart" />{counting}</Button>
               </NavLink>
             </NavItem>
 
