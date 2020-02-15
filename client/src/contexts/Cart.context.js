@@ -4,7 +4,6 @@ export const CartContext = React.createContext()
 
 export class CartProvider extends Component {
   constructor(props) {
-    console.log("Cart provider constructor")
     super(props)
 
     let localCart = localStorage.getItem("cart")
@@ -25,22 +24,46 @@ export class CartProvider extends Component {
     let stateItems = this.state.cartItems
     let itemToAdd
 
-      itemToAdd = stateItems.concat({product, quantity: 1})
+    if (stateItems.length < 1) {
+      itemToAdd = stateItems.concat({ product, quantity: 1 })
       this.setState((state) => ({
         cartItems: itemToAdd
       }))
-      
+    } else {
+      let index = -1;
+      findProduct()
+      function findProduct() {
+        for (let i = 0; i < stateItems.length; i++) {
+          if (stateItems[i].product.id === product.id) {
+            index = i
 
-    
+          }
+        }
+      }
+      if (index === -1) {
+        itemToAdd = stateItems.concat({ product, quantity: 1 })
+        this.setState(state => ({
+          cartItems: itemToAdd
+        }))
+      } else {
+        itemToAdd = [...stateItems]
+        itemToAdd[index].quantity += 1
+        this.setState(state => ({
+          cartItems: itemToAdd
+        }))
+      }
+    }
+
+
     console.log("state item first", this.state.cartItems)
 
 
 
   }
-componentDidUpdate(){
-localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
+  componentDidUpdate() {
+    localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
 
-}
+  }
 
   render() {
     console.log("state item ", this.state.cartItems)
