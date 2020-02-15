@@ -14,13 +14,8 @@ export class CartProvider extends Component {
     } else {
       localCart = []
       this.state = { cartItems: [...localCart] }
-      localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
 
     }
-
-    // this.state = {
-    //   cartItems: localCart
-    // }
 
     this.addToCart = this.addToCart.bind(this)
   }
@@ -29,22 +24,14 @@ export class CartProvider extends Component {
   addToCart(product) {
     let stateItems = this.state.cartItems
     let itemToAdd
-    if (stateItems === []) {
-      itemToAdd = product
-      this.setState((state) => ({
-        cartItems: [...state.cartItems, itemToAdd]
-      }))
-      // localStorage.setItem("cart", JSON.stringify(product))
 
-    }
-    else {
-      itemToAdd = stateItems.concat(product)
+      itemToAdd = stateItems.concat({product, quantity: 1})
       this.setState((state) => ({
         cartItems: itemToAdd
       }))
-      // localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
+      
 
-    }
+    
     console.log("state item first", this.state.cartItems)
 
 
