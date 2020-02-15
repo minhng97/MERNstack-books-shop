@@ -6,38 +6,57 @@ export class CartProvider extends Component {
   constructor(props) {
     console.log("Cart provider constructor")
     super(props)
-    
+
     let localCart = localStorage.getItem("cart")
     if (localCart !== 'null' && localCart !== null) {
-      localCart = localCart.split(",") // String to array
-    this.setState({ cartItems: localCart })
+      localCart = JSON.parse(localCart) // String to array
+      this.state = { cartItems: [...localCart] }
     } else {
       localCart = []
+      this.state = { cartItems: [...localCart] }
+      localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
+
     }
 
-    this.state = {
-      cartItems: localCart
-    }
+    // this.state = {
+    //   cartItems: localCart
+    // }
 
     this.addToCart = this.addToCart.bind(this)
   }
 
-  
+
   addToCart(product) {
     let stateItems = this.state.cartItems
-    let itemToAdd = stateItems.concat(product)
-    if(stateItems === []) { itemToAdd = product}
+    let itemToAdd
+    if (stateItems === []) {
+      itemToAdd = product
+      this.setState((state) => ({
+        cartItems: [...state.cartItems, itemToAdd]
+      }))
+      // localStorage.setItem("cart", JSON.stringify(product))
 
-    this.setState({
-      cartItems: itemToAdd
-    })
-    localStorage.setItem("cart", itemToAdd)
+    }
+    else {
+      itemToAdd = stateItems.concat(product)
+      this.setState((state) => ({
+        cartItems: itemToAdd
+      }))
+      // localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
+
+    }
+    console.log("state item first", this.state.cartItems)
+
+
 
   }
+componentDidUpdate(){
+localStorage.setItem("cart", JSON.stringify(this.state.cartItems))
 
+}
 
   render() {
-
+    console.log("state item ", this.state.cartItems)
 
     return <CartContext.Provider value={{
       cartItems: this.state.cartItems,
