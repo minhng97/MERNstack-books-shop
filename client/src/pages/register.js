@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'
+import Button from 'antd/es/button';
+import 'antd/dist/antd.css';
 
 class Register extends Component {
     constructor(props) {
@@ -8,73 +10,82 @@ class Register extends Component {
             username: '',
             password: '',
             arrUser: [],
-            info: ""
+            info: "",
+            loading: false,
+            iconLoading: false,
         }
-        this.handleChange = this.handleChange.bind(this)
-        this.submit = this.submit.bind(this)
     }
 
     checkUser = () => {
         // Get users from database
         axios.get('/api/reg')
             .then(({ data }) => {
-
                 this.setState({ arrUser: data })
-                console.log(this.state)
             })
             .catch((error) => {
                 alert('Error getting posts: ', error)
             })
-
     }
 
     handleChange = ({ target }) => {
         const { name, value } = target
-
         this.setState({
             [name]: value
         })
-        console.log(this.state)
     }
+    changeLoading = () => {
+        this.enterLoading()
+        this.enterIconLoading()
+    }
+    enterLoading = () => {
+        this.setState({ loading: !this.state.loading });
+    };
 
+    enterIconLoading = () => {
+        this.setState({ iconLoading: !this.state.iconLoading });
+    };
     submit = (event) => {
         event.preventDefault()
-
+        this.changeLoading()
         const payload = {
             username: this.state.username,
             password: this.state.password
         }
 
-
-        // Get users from database
-        axios({
-            url: '/api/reg',
-            method: 'POST',
-            data: payload,
-            timeout: 70000
-        })
-            .then((response) => {
-    
-                // Check if the username is already existed
-                const isUserExist = response.data.isUserExist
-                
-                if (isUserExist === true) {
-                    this.setState({ info: "The username is already exist" })
-                } else {
-                    this.setState({ info: "You have succesfully registered!" })
-
-                    setInterval(() => {
-                        window.location.href = '/';
-                    }, 1000);
-                    
-                }
-
-                console.log(this.state)
+        if (payload.username !== '' && payload.password !== '') {
+            // Get users from database
+            axios({
+                url: '/api/reg',
+                method: 'POST',
+                data: payload,
+                timeout: 70000
             })
-            .catch((error) => {
-                alert('Error getting users: ', error)
-            })
+                .then((response) => {
+                    // Check if the username is already existed
+                    const isUserExist = response.data.isUserExist
 
+                    if (isUserExist === false) {
+                        this.setState({ info: "You have succesfully registered!" })
+                        setInterval(() => {
+                            window.location.href = '/log'
+                        }, 1000);
+                    } else {
+                        this.setState({ info: "The username is already exist" })
+                        this.changeLoading()
+                    }
+                })
+                .catch((error) => {
+                    alert('Error getting users: ', error)
+                })
+        } else {
+            this.setState((state) =>
+                ({
+                    info: "Please enter username and password",
+                    iconLoading: !state.iconLoading,
+                    loading: !state.loading
+                })
+            )
+        }
     }
 
 
@@ -83,7 +94,7 @@ class Register extends Component {
         return (
             <div className="app">
 
-                <div className="alert alert-info">
+                <div className="alert alert-success">
                     {this.state.info}
                     <form onSubmit={this.submit}>
                         <div className="form-input">
@@ -105,7 +116,9 @@ class Register extends Component {
                             </input>
                         </div>
 
-                        <button>Submit</button>
+                        <Button type="primary" loading={this.state.loading} style={{ backgroundColor: "#18cc3e", border: "1px solid #18cc3e" }} onClick={this.submit}>
+                            Register now
+                        </Button>
                     </form>
 
                 </div>
