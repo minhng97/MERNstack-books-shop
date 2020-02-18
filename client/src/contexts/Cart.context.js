@@ -9,51 +9,39 @@ export class CartProvider extends Component {
     let localCart = localStorage.getItem("cart")
     if (localCart !== 'null' && localCart !== null) {
       localCart = JSON.parse(localCart) // String to array
-      this.state = { cartItems: [...localCart] }
     } else {
       localCart = []
-      this.state = { cartItems: [...localCart] }
-
     }
+    this.state = { cartItems: [...localCart] }
 
     this.addToCart = this.addToCart.bind(this)
   }
 
 
   addToCart(product) {
-    let stateItems = this.state.cartItems
+    let { cartItems } = this.state
     let itemToAdd
 
-    if (stateItems.length < 1) {
-      itemToAdd = stateItems.concat({ product, quantity: 1 })
-      this.setState((state) => ({
-        cartItems: itemToAdd
-      }))
-    } else {
-      let index = -1;
-      findProduct()
-      function findProduct() {
-        for (let i = 0; i < stateItems.length; i++) {
-          if (stateItems[i].product.id === product.id) {
-            index = i
 
-          }
+    let index = -1;
+    findProduct()
+    function findProduct() {
+      for (let i = 0; i < cartItems.length; i++) {
+        if (cartItems[i].product.id === product.id) {
+          index = i
         }
       }
-      if (index === -1) {
-        itemToAdd = stateItems.concat({ product, quantity: 1 })
-        this.setState(state => ({
-          cartItems: itemToAdd
-        }))
-      } else {
-        itemToAdd = [...stateItems]
-        itemToAdd[index].quantity += 1
-        this.setState(state => ({
-          cartItems: itemToAdd
-        }))
-      }
+    }
+    if (index === -1) {
+      itemToAdd = [...cartItems, { product, quantity: 1 }]
+    } else {
+      itemToAdd = [...cartItems]
+      itemToAdd[index].quantity += 1
     }
 
+    this.setState(state => ({
+      cartItems: itemToAdd
+    }))
 
     console.log("state item first", this.state.cartItems)
 
