@@ -19,7 +19,9 @@ export class UserState extends Component {
             cartItems: this.state.cartItems.concat(this.product)
         })
     }
-
+    savelogin() {
+        this.setState({ login: true })
+    }
     logout() {
         this.setState({ login: false })
     }
@@ -29,6 +31,7 @@ export class UserState extends Component {
             login: this.state.login,
             cartItems: this.state.cartItems,
             addToCart: this.addToCart,
+            savelogin:this.savelogin,
             logout: this.logout
         }}>
             {this.props.children}
