@@ -6,13 +6,9 @@ export class CartProvider extends Component {
   constructor(props) {
     super(props)
 
-    let localCart = localStorage.getItem("cart")
-    if (localCart !== 'null' && localCart !== null) {
-      localCart = JSON.parse(localCart) // String to array
-    } else {
-      localCart = []
-    }
-    this.state = { cartItems: [...localCart] }
+    let localCart = JSON.parse(localStorage.getItem("cart")) || []
+
+    this.state = { cartItems: localCart }
 
     this.addToCart = this.addToCart.bind(this)
   }
@@ -20,18 +16,17 @@ export class CartProvider extends Component {
 
   addToCart(product) {
     let { cartItems } = this.state
-    let itemToAdd
-
-
+    let itemToAdd = null
     let index = -1;
-    findProduct()
-    function findProduct() {
+
+    (function findProduct() {
       for (let i = 0; i < cartItems.length; i++) {
         if (cartItems[i].product.id === product.id) {
           index = i
         }
       }
-    }
+    })()
+
     if (index === -1) {
       itemToAdd = [...cartItems, { product, quantity: 1 }]
     } else {
@@ -43,7 +38,6 @@ export class CartProvider extends Component {
       cartItems: itemToAdd
     }))
 
-    console.log("state item first", this.state.cartItems)
 
 
 
@@ -54,13 +48,14 @@ export class CartProvider extends Component {
   }
 
   render() {
-    console.log("state item ", this.state.cartItems)
 
-    return <CartContext.Provider value={{
-      cartItems: this.state.cartItems,
-      addToCart: this.addToCart
-    }}>
-      {this.props.children}
-    </CartContext.Provider>
+    return (
+      <CartContext.Provider value={{
+        cartItems: this.state.cartItems,
+        addToCart: this.addToCart
+      }}>
+        {this.props.children}
+      </CartContext.Provider>)
+
   }
 }
