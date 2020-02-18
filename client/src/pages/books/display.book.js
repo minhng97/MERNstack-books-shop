@@ -5,7 +5,7 @@ import { CartContext } from '../../contexts/Cart.context'
 
 export default function (bookData) {
     const context = useContext(CartContext)
-    console.log("cartcontext:", context)
+
     if (!bookData) { return null }
     return (bookData.map(book => <Col
         xs="12"
@@ -19,7 +19,11 @@ export default function (bookData) {
         <p className="books__display--authors"><span>{book.authors[0]}</span></p>
         <p className="books__display--description">{book.shortDescription}</p>
 
-        <Button onClick={() => context.addToCart(book._id)}
+        <Button onClick={() => context.addToCart({
+            id: book._id,
+            title: book.title,
+            thumbnail: book.thumbnailUrl
+        })}
             type="primary"
             width="">
             <Icon type="shopping-cart" />
