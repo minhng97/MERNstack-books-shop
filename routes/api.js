@@ -139,7 +139,11 @@ router.post('/reg', async (req, res) => {
 });
 
 router.post('/checkauth', verify, (req, res) => {
-  res.send();
+  console.log( 'token: ', req.token)
+  res.send({
+    msg: true,
+    token: req.token
+  });
 });
 // Books page
 
