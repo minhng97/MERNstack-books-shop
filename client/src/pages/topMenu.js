@@ -9,6 +9,7 @@ import {
   NavItem
 } from 'reactstrap';
 import { Button, Icon } from 'antd';
+import { Breadcrumb } from 'antd';
 
 import { NavLink } from 'react-router-dom';
 
@@ -18,7 +19,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-const TopMenu = ({ cartItems }) => {
+const TopMenu = ({ location, cartItems }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const counting = cartItems.reduce((acc, curr) => acc + curr.quantity, 0);
@@ -71,6 +72,11 @@ const TopMenu = ({ cartItems }) => {
         </Collapse>
       </Navbar>
 
+      <Breadcrumb separator=">">
+    <Breadcrumb.Item>Home</Breadcrumb.Item>
+    
+  </Breadcrumb>
+
       <Button type="danger" color="warning" onClick={logout}>Logout</Button>
     </>
 
@@ -79,7 +85,7 @@ const TopMenu = ({ cartItems }) => {
 
 const mapStateToProps = (state) => {
   return {
-    cartItems: state
+    cartItems: state.cartItems
   }
 }
 

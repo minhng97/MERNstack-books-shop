@@ -4,11 +4,19 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import { createStore } from 'redux'
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
+import thunk from 'redux-thunk'
 import { Provider } from 'react-redux'
-import reducer from './reducers/Cart.reducer'
+import cartReducer from './reducers/Cart.reducer'
+import userReducer from './reducers/User.reducer'
 
-const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+const matterReducer = combineReducers({
+    cartItems: cartReducer,
+    userAuth: userReducer,
+})
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(matterReducer, composeEnhancers(applyMiddleware(thunk)))
 
 ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
 

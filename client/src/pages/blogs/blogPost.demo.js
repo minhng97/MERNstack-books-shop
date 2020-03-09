@@ -10,14 +10,18 @@ import BlogForm from './blogForm'
 
 
 class BlogPost extends Component {
-    state = {
-        title: '',
-        body: '',
-        posts: [],
-        info: null,
-        loading: false,
-        iconLoading: false,
+    constructor(props){
+        super(props)
+        state = {
+            title: '',
+            body: '',
+            posts: [],
+            info: null,
+            loading: false,
+            iconLoading: false,
+        }
     }
+    
 
     async componentDidMount() {
         try {
@@ -30,10 +34,7 @@ class BlogPost extends Component {
         }
     }
 
-    getBlogPost = () => {
-        // Get posts from database
-        return axios.get('/api')
-    }
+    getBlogPost = () => axios.get('/api')
 
     handleChange = ({ target }) => {
         const { name, value } = target;
