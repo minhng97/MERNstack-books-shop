@@ -54,7 +54,7 @@ const CartBook = ({ cartItems }) => {
 
 const mapStateToProps = (state) => {
   return {
-    cartItems: state
+    cartItems: state.cartItems
   }
 }
 
